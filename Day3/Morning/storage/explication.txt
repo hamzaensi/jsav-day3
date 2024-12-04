@@ -1,0 +1,189 @@
+
+
+
+1. Introduction au Stockage Côté Client
+Les applications web modernes nécessitent souvent de conserver 
+des informations 
+entre les sessions utilisateur, des paniers d'achat,
+ou des données pour un mode hors ligne. 
+ 
+ Le stockage côté client permet de remplir ces besoins sans 
+ avoir à interagir 
+ constamment avec un serveur.
+
+LocalStorage : Permet de stocker des données sous forme de paires
+ clé-valeur.
+IndexedDB : Un système de base de données côté client plus 
+complexe, permettant 
+de stocker des objets JavaScript et de gérer des 
+bases de données locales.
+
+
+
+2. LocalStorage
+2.1 Qu'est-ce que LocalStorage ?
+LocalStorage est une solution de stockage clé-valeur qui 
+permet de conserver 
+des données de manière persistante dans le navigateur, 
+même après la fermeture
+ de celui-ci. C'est un stockage synchronisé et simple à utiliser.
+
+Caractéristiques :
+
+Stockage de données sous forme de paires clé-valeur.
+La capacité est généralement de 5 à 10 Mo, ce qui peut 
+suffire pour stocker des 
+préférences utilisateur ou des données de session.
+Les données sont persistantes, c'est-à-dire qu'elles sont 
+conservées même après
+ la fermeture du navigateur ou du tab.
+Accessible depuis le même domaine, mais partagé entre 
+les différentes fenêtres 
+et onglets.
+
+
+2.2 Exemple d'utilisation de LocalStorage :
+
+// Stocker des données dans LocalStorage
+localStorage.setItem('username', 'john_doe');
+localStorage.setItem('theme', 'dark');
+
+// Récupérer des données de LocalStorage
+let username = localStorage.getItem('username');
+let theme = localStorage.getItem('theme');
+console.log(username);  // john_doe
+console.log(theme);     // dark
+
+// Supprimer une donnée
+localStorage.removeItem('theme');
+
+// Effacer toutes les données
+localStorage.clear();
+
+
+
+2.3 Limites de LocalStorage
+Capacité : La capacité est limitée (généralement 5 à 10 Mo par
+ domaine), 
+ce qui le rend inapproprié pour le stockage de grandes quantités
+ de données.
+Sécurité : Les données sont stockées sous forme de texte brut,
+ ce qui signifie 
+que toute personne ayant accès à la machine peut y accéder.
+Pas de gestion des types de données : LocalStorage ne permet 
+de stocker que 
+des chaînes de caractères. Pour stocker des objets, 
+vous devez les sérialiser 
+(par exemple, avec JSON.stringify()).
+
+
+
+3. IndexedDB
+3.1 Qu'est-ce que IndexedDB ?
+IndexedDB est une API plus avancée que LocalStorage, permettant 
+de stocker des objets 
+JavaScript complexes sous forme de bases de données. C'est une 
+solution plus adaptée
+ aux applications qui nécessitent un stockage important ou 
+ une gestion de données 
+ plus sophistiquée.
+
+Caractéristiques :
+
+Permet de stocker des objets JavaScript, y compris des tableaux 
+et des objets.
+Utilise une approche asynchrone pour gérer les opérations 
+de lecture/écriture, 
+ce qui améliore les performances pour les grandes quantités 
+de données.
+Indexation des données pour effectuer des recherches plus rapides.
+
+Capacité de stockage plus grande que LocalStorage 
+(des centaines de Mo).
+
+3.2 Exemple d'utilisation de IndexedDB :
+
+
+// Ouvrir ou créer une base de données
+let db;
+let request = indexedDB.open('MyDatabase', 1);
+
+request.onupgradeneeded = function(event) {
+  db = event.target.result;
+  // Créer un objet store (table) dans la base de données
+  let objectStore = db.createObjectStore('users', { keyPath: 'id' });
+  objectStore.createIndex('name', 'name', { unique: false });
+};
+
+request.onsuccess = function(event) {
+  db = event.target.result;
+  console.log("Base de données ouverte avec succès");
+};
+
+request.onerror = function(event) {
+  console.error("Erreur lors de l'ouverture de la base de données");
+};
+
+// Ajouter des données
+function addUser() {
+  let transaction = db.transaction(['users'], 'readwrite');
+  let objectStore = transaction.objectStore('users');
+  let user = { id: 1, name: 'John Doe', email: 'john@example.com' };
+  objectStore.add(user);
+}
+
+// Récupérer des données
+function getUser() {
+  let transaction = db.transaction(['users']);
+  let objectStore = transaction.objectStore('users');
+  let request = objectStore.get(1);
+
+  request.onsuccess = function(event) {
+    console.log(request.result);
+  };
+}
+
+
+
+
+3.3 Limites de IndexedDB
+Complexité : L'API IndexedDB est plus complexe que LocalStorage et 
+nécessite une gestion asynchrone, ce qui peut rendre l'usage plus 
+difficile pour des cas simples.
+Compatibilité : IndexedDB est largement supporté dans les navigateurs modernes, 
+mais certains anciens navigateurs ne le supportent pas.
+
+
+
+4. Comparaison entre LocalStorage et IndexedDB
+
+Images sur bureau "storage"
+
+
+
+5. Bonnes Pratiques pour l'Utilisation du Stockage Côté Client
+Sécuriser les données : Évitez de stocker des informations sensibles 
+(comme des mots de passe ou des informations bancaires) dans LocalStorage
+ ou IndexedDB. Envisagez l'utilisation de cryptage si nécessaire.
+Utiliser avec parcimonie : Ne surchargez pas les solutions de stockage 
+avec des données trop volumineuses. Utilisez IndexedDB pour les applications
+ plus complexes, et LocalStorage pour des données simples et persistantes.
+Gestion asynchrone pour IndexedDB : Comme IndexedDB utilise des appels asynchrones,
+assurez-vous de bien gérer les promesses ou les callbacks pour éviter les erreurs de synchronisation.
+
+
+
+
+6. Conclusion
+Les solutions de stockage côté client, comme LocalStorage et IndexedDB, 
+sont des outils puissants permettant de stocker des données localement 
+dans le navigateur. LocalStorage est idéal pour des besoins simples de 
+stockage de petites données, tandis qu'IndexedDB est une solution plus 
+robuste pour des applications nécessitant un stockage complexe et une 
+gestion plus sophistiquée des données. En combinant ces deux outils, 
+vous pouvez créer des applications web réactives et performantes qui 
+offrent une expérience utilisateur améliorée, même sans connexion Internet.
+
+
+
+

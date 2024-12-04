@@ -1,0 +1,33 @@
+
+Créer une petite application qui affiche, ajoute et supprime 
+des produits à partir d'une API simulée.
+
+Divisez les fichiers :
+
+apiService.js : Pour simuler les appels à l'API.
+productService.js : Pour la logique métier liée aux produits.
+productUI.js : Pour l'affichage des produits.
+app.js : Le point d'entrée.
+Les fonctionnalités doivent inclure :
+
+Afficher une liste de produits.
+Ajouter un produit.
+Supprimer un produit.
+
+apiService.js
+
+let products = [];
+
+export function fetchProducts() {
+    return Promise.resolve(products);
+}
+
+export function addProductToApi(product) {
+    products.push(product);
+    return Promise.resolve(product);
+}
+
+export function deleteProductFromApi(id) {
+    products = products.filter(product => product.id !== id);
+    return Promise.resolve();
+}

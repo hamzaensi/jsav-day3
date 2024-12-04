@@ -1,0 +1,14 @@
+Créer une application simple où un utilisateur peut se connecter, se déconnecter et afficher un profil.
+
+Consignes
+Divisez les fichiers :
+
+authService.js : Gère l'inscription, la connexion et la déconnexion.
+userService.js : Gère les données utilisateur.
+authUI.js : Gère l'interface utilisateur pour la connexion et l'inscription.
+app.js : Connecte les services et l'interface.
+Fonctionnalités :
+
+Connexion.
+Déconnexion.
+Affichage des données utilisateur.

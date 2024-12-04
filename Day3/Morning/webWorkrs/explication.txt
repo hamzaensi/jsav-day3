@@ -1,0 +1,103 @@
+1. Qu'est-ce qu'un Web Worker ?
+Un Web Worker est un mécanisme en JavaScript qui permet d'exécuter
+ des tâches en parallèle sur un thread séparé sans bloquer 
+ le thread principal, celui qui gère l'interface utilisateur
+  du navigateur. Les Web Workers sont utilisés principalement
+   pour des tâches qui nécessitent des calculs lourds ou des 
+   traitements de données sans que cela affecte la réactivité
+    de l'interface utilisateur.
+
+Les tâches peuvent être exécutées en arrière-plan pendant que 
+le thread principal continue de répondre aux interactions de
+ l'utilisateur. Cela permet d'éviter les blocages de l'interface
+  qui peuvent rendre l'application lente ou peu réactive.
+
+2. Pourquoi utiliser un Web Worker ?
+Lorsque vous avez des calculs longs ou des tâches gourmandes en ressources (par exemple, des calculs mathématiques complexes, du traitement de données volumineuses, des appels à des API externes), cela peut bloquer le thread principal et nuire à l'expérience utilisateur. Utiliser un Web Worker permet de déplacer ces tâches vers un thread séparé, améliorant ainsi la performance et la réactivité de l'application.
+
+3. Fonctionnement des Web Workers
+Les Web Workers s'exécutent sur un thread parallèle, ce qui signifie que le code du Worker n'a pas accès au DOM de la page ni aux variables globales du thread principal. Cependant, le thread principal peut communiquer avec le Web Worker via un mécanisme de message, en envoyant et en recevant des données.
+
+4. Création et utilisation d'un Web Worker
+Étape 1 : Création d'un fichier Worker
+Un Web Worker nécessite généralement un fichier JavaScript externe qui contient le code à exécuter dans le worker. Ce fichier sera chargé par le thread principal.
+
+Exemple : worker.js (le code à exécuter dans le Worker)
+
+// worker.js
+onmessage = function(e) {
+  console.log("Message reçu du thread principal : ", e.data);
+  let result = e.data * 2;  // Traitement de données
+  postMessage(result);  // Envoi du résultat au thread principal
+}
+Étape 2 : Création d'un Web Worker côté principal
+Dans le thread principal (généralement dans le fichier principal JavaScript), vous pouvez créer un Web Worker en utilisant le constructeur Worker.
+
+Exemple : main.js (le code principal qui interagit avec le Worker)
+
+// Création d'un Web Worker à partir du fichier worker.js
+let worker = new Worker('worker.js');
+
+// Envoi d'un message au Worker
+worker.postMessage(5);  // Le Worker recevra le nombre 5
+
+// Réception du résultat du Worker
+worker.onmessage = function(e) {
+  console.log("Résultat reçu du Worker : ", e.data);  // Affiche : 10
+}
+
+// Gérer les erreurs
+worker.onerror = function(error) {
+  console.error('Erreur dans le Worker : ', error);
+}
+Explication du code :
+new Worker('worker.js') : Crée une instance de Web Worker en spécifiant le fichier JavaScript contenant le code à exécuter.
+postMessage() : Envoie un message (données) du thread principal au Worker.
+onmessage : Un gestionnaire d'événements qui reçoit un message envoyé par le Worker. Dans ce cas, il reçoit le résultat du calcul.
+postMessage() dans le Worker : Permet au Worker de renvoyer des données au thread principal.
+5. Avantages des Web Workers
+Amélioration de la performance : Permet d'effectuer des tâches longues ou complexes en arrière-plan sans bloquer le thread principal.
+Réactivité de l'interface utilisateur : Les Web Workers permettent à l'interface utilisateur de rester fluide et réactive pendant que des traitements de données lourds sont effectués.
+Traitement parallèle : Permet d'effectuer des calculs sur plusieurs threads en parallèle, ce qui peut améliorer les performances dans des applications complexes.
+6. Limitations des Web Workers
+Pas d'accès au DOM : Un Web Worker n'a pas accès au DOM de la page web. Il ne peut interagir qu'avec les données, mais ne peut pas modifier l'interface utilisateur.
+Communication limitée : Les Web Workers communiquent avec le thread principal uniquement via des messages. Les objets envoyés doivent être clonables (par exemple, les données primitives, mais pas les objets DOM ou les fonctions).
+Consommation de ressources : Bien que les Web Workers soient utiles pour les calculs lourds, chaque Worker consomme des ressources système, et une trop grande quantité de Workers peut nuire aux performances.
+7. Web Workers et types de données
+Les données envoyées entre le thread principal et un Web Worker sont copiées plutôt que partagées. Cela signifie qu'il n'y a pas de risques de concurrence sur les mêmes données entre les deux threads, mais cela peut être moins efficace pour des données volumineuses.
+
+Clonage des objets : Les objets envoyés via postMessage() sont clonés (par exemple, les tableaux et objets sont copiés), donc des objets complexes ou volumineux peuvent entraîner des surcharges.
+8. Fermeture d'un Web Worker
+Il est essentiel de fermer proprement un Web Worker lorsque son travail est terminé pour libérer les ressources. Cela peut être fait côté thread principal en appelant worker.terminate().
+
+Exemple :
+
+worker.terminate();  // Terminer immédiatement le Worker
+Ou côté Worker, en appelant close() pour indiquer qu'il a
+ terminé son travail :
+
+// worker.js
+close();  // Fermer le Worker proprement
+9. Exemple d’application avec Web Worker
+Imaginons une application qui effectue un calcul complexe (par exemple, une série de calculs mathématiques) sans bloquer l'interface utilisateur. Vous pouvez exécuter ces calculs dans un Web Worker et envoyer les résultats au thread principal pour affichage, tout en maintenant l'UI fluide.
+
+// Code dans le thread principal (main.js)
+let worker = new Worker('worker.js');
+
+// Envoi des données au Worker pour traitement
+worker.postMessage({ action: 'calcul', value: 1000 });
+
+// Réception du résultat et mise à jour de l'UI
+worker.onmessage = function(e) {
+  document.getElementById('result').innerText = 'Résultat : ' + e.data;
+}
+10. Conclusion
+Les Web Workers sont un outil essentiel pour améliorer la performance des applications web en permettant l'exécution parallèle de tâches lourdes. Ils permettent de garder l'interface utilisateur réactive tout en exécutant des calculs en arrière-plan. Cependant, leur utilisation doit être judicieusement planifiée, car leur communication est limitée et leur gestion de ressources nécessite une attention particulière.
+
+
+
+// Retarder l'envoi du résultat avec setTimeout
+        setTimeout(function() {
+            // Envoyer le résultat au script principal
+            postMessage(result);
+        }, 2000); // Le résultat sera envoyé après 2000 millisecondes (2 secondes)
